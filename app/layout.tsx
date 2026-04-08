@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Toaster } from "@/components/ui/sonner"
+import { ContactModalProvider } from "@/components/contact-modal"
 import { cn } from "@/lib/utils"
 
 const notoSans = Noto_Sans({
@@ -26,9 +27,11 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning className={cn("antialiased", notoSans.variable)}>
       <body>
         <ThemeProvider defaultTheme="light" enableSystem={false}>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <ContactModalProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </ContactModalProvider>
           <Toaster />
         </ThemeProvider>
       </body>

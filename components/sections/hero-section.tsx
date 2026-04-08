@@ -1,17 +1,18 @@
 "use client";
 
-import Link from "next/link";
+import { useContactModal } from "@/components/contact-modal";
 import FloatingLines from "../floating-lines";
 
 export function HeroSection() {
+  const { open: openModal } = useContactModal();
   return (
     <section
-      className="relative min-h-[85svh] -mb-[100px] flex items-center overflow-hidden bg-[#0a0a0a]"
+      className="relative lg:min-h-svh min-h-[60svh] -mb-25 flex items-center overflow-hidden bg-surface-dark"
       style={{ clipPath: "polygon(0 0, 100% 0, 100% 92%, 0 100%)" }}
     >
       {/* FloatingLines WebGL background — canvas extends below section so waves fill the bottom edge */}
       <div
-        className="absolute inset-x-0 top-0 opacity-25"
+        className="absolute inset-x-0 top-0 opacity-50"
         style={{ bottom: "-25%" }}
       >
         <FloatingLines
@@ -24,7 +25,7 @@ export function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 -translate-y-[50px]">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 -translate-y-12.5">
         <div className="max-w-3xl">
           {/* Accent line */}
           <div className="flex items-center gap-3 mb-6">
@@ -47,12 +48,13 @@ export function HeroSection() {
           </p>
 
           <div className="flex flex-wrap gap-4">
-            <Link
-              href="/contacts"
+            <button
+              type="button"
+              onClick={openModal}
               className="inline-flex items-center px-8 py-3.5 bg-brand hover:bg-brand-dark text-white font-semibold text-sm transition-colors rounded-sm"
             >
               Оставить заявку
-            </Link>
+            </button>
             <a
               href="/services"
               className="inline-flex items-center px-8 py-3.5 border border-white/30 hover:border-white text-white font-semibold text-sm transition-colors rounded-sm"

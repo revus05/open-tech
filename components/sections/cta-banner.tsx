@@ -1,6 +1,9 @@
-import Link from "next/link"
+"use client"
+
+import { useContactModal } from "@/components/contact-modal"
 
 export function CTABanner() {
+  const { open: openModal } = useContactModal();
   return (
     <section
       className="bg-[#0a0a0a] py-20 relative overflow-hidden"
@@ -32,12 +35,13 @@ export function CTABanner() {
           для вашего бизнеса.
         </p>
 
-        <Link
-          href="/contacts"
+        <button
+          type="button"
+          onClick={openModal}
           className="inline-flex items-center px-10 py-4 bg-brand hover:bg-brand-dark text-white font-bold text-sm transition-colors rounded-sm"
         >
           Оставить заявку
-        </Link>
+        </button>
       </div>
     </section>
   )

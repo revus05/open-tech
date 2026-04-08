@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import logo from "public/logo.png";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useContactModal } from "@/components/contact-modal";
 
 const NAV_LINKS = [
   { href: "/", label: "Главная" },
@@ -18,13 +19,14 @@ const NAV_LINKS = [
 export function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { open: openModal } = useContactModal();
 
   return (
     <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 h-16 py-2">
+          <Link href="/" className="flex items-center gap-2 shrink-0 h-18 py-4">
             <Image
               src={logo.src}
               height={100}
@@ -54,12 +56,13 @@ export function Header() {
 
           {/* CTA + hamburger */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/contacts"
+            <button
+              type="button"
+              onClick={openModal}
               className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-brand hover:bg-brand-dark transition-colors rounded-sm"
             >
               Оставить заявку
-            </Link>
+            </button>
 
             <button
               type="button"
@@ -91,13 +94,13 @@ export function Header() {
               </Link>
             ))}
             <div className="pt-2 px-4">
-              <Link
-                href="/contacts"
-                onClick={() => setMenuOpen(false)}
+              <button
+                type="button"
+                onClick={() => { setMenuOpen(false); openModal(); }}
                 className="block w-full py-2.5 text-sm font-semibold text-white text-center bg-brand hover:bg-brand-dark transition-colors rounded-sm"
               >
                 Оставить заявку
-              </Link>
+              </button>
             </div>
           </div>
         )}

@@ -1,6 +1,6 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-import { SERVICES_CREATION, SERVICES_SUPPORT } from "@/lib/data"
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { SERVICES_CREATION, SERVICES_SUPPORT } from "@/lib/data";
 
 export function ServicesOverview() {
   return (
@@ -42,14 +42,17 @@ export function ServicesOverview() {
             </h3>
             <ul className="space-y-2.5">
               {SERVICES_CREATION.slice(0, 6).map((service) => (
-                <li key={service} className="flex items-start gap-2.5 text-sm text-gray-600">
+                <li
+                  key={service}
+                  className="flex items-start gap-2.5 text-sm text-gray-600"
+                >
                   <div className="w-1 h-1 rounded-full bg-brand mt-2 shrink-0" />
                   {service}
                 </li>
               ))}
               {SERVICES_CREATION.length > 6 && (
                 <li className="text-sm text-gray-400 pl-3.5">
-                  и ещё {SERVICES_CREATION.length - 6} направления...
+                  и ещё {SERVICES_CREATION.length - 6} направлений...
                 </li>
               )}
             </ul>
@@ -58,10 +61,15 @@ export function ServicesOverview() {
           {/* Service & Outsourcing */}
           <div className="bg-white border border-gray-200 p-8 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-brand" />
-            <h3 className="text-lg font-bold text-gray-900 mb-5">Сервис и аутсорсинг</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-5">
+              Сервис и аутсорсинг
+            </h3>
             <ul className="space-y-2.5">
               {SERVICES_SUPPORT.slice(0, 6).map((service) => (
-                <li key={service} className="flex items-start gap-2.5 text-sm text-gray-600">
+                <li
+                  key={service}
+                  className="flex items-start gap-2.5 text-sm text-gray-600"
+                >
                   <div className="w-1 h-1 rounded-full bg-brand mt-2 shrink-0" />
                   {service}
                 </li>
@@ -76,5 +84,5 @@ export function ServicesOverview() {
         </div>
       </div>
     </section>
-  )
+  );
 }

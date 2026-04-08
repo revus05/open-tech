@@ -6,7 +6,6 @@ import {
   Phone,
   Printer,
 } from "lucide-react";
-import { ContactFormInline } from "@/components/contact-form-inline";
 import { CONTACT_INFO } from "@/lib/data";
 
 export const metadata = {
@@ -19,7 +18,7 @@ export default function ContactsPage() {
   return (
     <>
       {/* Page header */}
-      <div className="bg-[#0a0a0a] py-16 relative overflow-hidden">
+      <div className="bg-surface-dark py-16 relative overflow-hidden">
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -150,19 +149,14 @@ export default function ContactsPage() {
           </div>
 
           {/* Map placeholder + CTA */}
-          <div className="space-y-6">
-            {/* Map placeholder */}
-            <div className="aspect-video bg-gray-100 border border-gray-200 flex items-center justify-center">
-              <iframe
-                src="https://yandex.ru/map-widget/v1/?um=constructor%3A2f4afa237a597b21a23edd227209862531e045bfebeb7346703ba6cdc50c3c92&amp;source=constructor"
-                width="600"
-                height="400"
-                frameBorder="0"
-              ></iframe>
-            </div>
-
-            {/* Inline contact form */}
-            <ContactFormInline />
+          {/* Map placeholder */}
+          <div className="aspect-video bg-gray-100 border border-gray-200 flex items-center justify-center">
+            <iframe
+              title="Map"
+              src="https://yandex.ru/map-widget/v1/?um=constructor%3A2f4afa237a597b21a23edd227209862531e045bfebeb7346703ba6cdc50c3c92&amp;source=constructor"
+              width="600"
+              height="400"
+            />
           </div>
         </div>
       </section>
