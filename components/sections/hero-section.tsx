@@ -10,7 +10,6 @@ export function HeroSection() {
       className="relative lg:min-h-svh min-h-[60svh] -mb-25 flex items-center overflow-hidden bg-surface-dark"
       style={{ clipPath: "polygon(0 0, 100% 0, 100% 92%, 0 100%)" }}
     >
-      {/* FloatingLines WebGL background — canvas extends below section so waves fill the bottom edge */}
       <div
         className="absolute inset-x-0 top-0 opacity-50"
         style={{ bottom: "-25%" }}
