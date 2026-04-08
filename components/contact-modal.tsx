@@ -20,7 +20,11 @@ import { Textarea } from "@/components/ui/textarea";
 /* ─── Validation schema ───────────────────────────────────────── */
 
 const contactSchema = z.object({
-  name: z.string().min(2, "Введите ваше имя (минимум 2 символа)"),
+  name: z.string()
+    .min(2, "Введите ваше имя (минимум 2 символа)")
+    .refine((val) => !/\d/.test(val), {
+      message: "Имя не должно содержать цифры",
+    }),
   phone: z.string().refine((val) => {
     const cleaned = val.replace(/[\s\-()]/g, "");
     return /^(\+375|80)(17|25|29|33|44)\d{7}$/.test(cleaned);
