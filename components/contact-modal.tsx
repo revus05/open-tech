@@ -1,9 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { createContext, useContext, useState } from "react";
+import { createContext, type ReactNode, useContext, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   DialogHeader,
@@ -14,11 +17,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
+/* ─── Validation schema ───────────────────────────────────────── */
+
+const contactSchema = z.object({
+  name: z.string().min(2, "Введите ваше имя (минимум 2 символа)"),
+  phone: z.string().refine((val) => {
+    const cleaned = val.replace(/[\s\-()]/g, "");
+    return /^(\+375|80)(17|25|29|33|44)\d{7}$/.test(cleaned);
+  }, "Введите корректный номер (+375 XX XXX-XX-XX)"),
+  message: z.string().optional(),
+});
+
+type ContactFields = z.infer<typeof contactSchema>;
+
 /* ─── Context ─────────────────────────────────────────────────── */
 
-type ContactModalCtx = {
-  open: () => void;
-};
+type ContactModalCtx = { open: () => void };
 
 const ContactModalContext = createContext<ContactModalCtx>({ open: () => {} });
 
@@ -28,41 +42,35 @@ export function useContactModal() {
 
 /* ─── Provider + Modal ────────────────────────────────────────── */
 
-export function ContactModalProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ContactModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ContactFields>({
+    resolver: zodResolver(contactSchema),
+  });
 
+  const onSubmit = async (data: ContactFields) => {
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, message }),
+        body: JSON.stringify(data),
       });
 
       if (res.ok) {
         toast.success("Заявка принята. Мы перезвоним вам в ближайшее время!");
-        setName("");
-        setPhone("");
-        setMessage("");
+        reset();
         setIsOpen(false);
       } else {
         toast.error("Ошибка отправки. Позвоните нам напрямую.");
       }
     } catch {
       toast.error("Ошибка сети. Позвоните нам напрямую.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -70,13 +78,17 @@ export function ContactModalProvider({
     <ContactModalContext.Provider value={{ open: () => setIsOpen(true) }}>
       {children}
 
-      <DialogPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
+      <DialogPrimitive.Root
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) reset();
+          setIsOpen(open);
+        }}
+      >
         <DialogPortal>
           <DialogOverlay />
           <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-50 w-full max-w-[calc(100%-2rem)] sm:max-w-md -translate-x-1/2 -translate-y-1/2 outline-none duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
-            {/* Form panel — reuses ContactFormInline design */}
             <div className="bg-gray-50 border border-gray-200 p-6 relative rounded-lg shadow-2xl">
-              {/* Close button */}
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -97,7 +109,7 @@ export function ContactModalProvider({
                 9:00–18:00).
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-1">
                   <label
                     htmlFor="modal-name"
@@ -108,11 +120,20 @@ export function ContactModalProvider({
                   <Input
                     id="modal-name"
                     placeholder="Иван Иванов"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    disabled={loading}
+                    aria-invalid={!!errors.name}
+                    className={
+                      errors.name
+                        ? "border-red-400 focus-visible:ring-red-300"
+                        : ""
+                    }
+                    disabled={isSubmitting}
+                    {...register("name")}
                   />
+                  {errors.name && (
+                    <p className="text-xs text-red-500">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1">
@@ -126,11 +147,20 @@ export function ContactModalProvider({
                     id="modal-phone"
                     type="tel"
                     placeholder="+375 (XX) XXX-XX-XX"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    disabled={loading}
+                    aria-invalid={!!errors.phone}
+                    className={
+                      errors.phone
+                        ? "border-red-400 focus-visible:ring-red-300"
+                        : ""
+                    }
+                    disabled={isSubmitting}
+                    {...register("phone")}
                   />
+                  {errors.phone && (
+                    <p className="text-xs text-red-500">
+                      {errors.phone.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1">
@@ -147,18 +177,17 @@ export function ContactModalProvider({
                     id="modal-message"
                     placeholder="Опишите вашу задачу..."
                     rows={4}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    disabled={loading}
+                    disabled={isSubmitting}
+                    {...register("message")}
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  disabled={loading}
+                  disabled={isSubmitting}
                   className="w-full bg-brand hover:bg-brand-dark text-white font-semibold rounded-sm"
                 >
-                  {loading ? "Отправка..." : "Отправить заявку"}
+                  {isSubmitting ? "Отправка..." : "Отправить заявку"}
                 </Button>
               </form>
             </div>
