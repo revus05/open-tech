@@ -182,7 +182,6 @@ export function ContactModalProvider({ children }: { children: ReactNode }) {
                     </p>
                   )}
                 </div>
-
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700">
                     Категория услуг <span className="text-brand">*</span>
