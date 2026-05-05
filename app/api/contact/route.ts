@@ -45,7 +45,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function emailHtml(name: string, phone: string, message: string): string {
+function emailHtml(
+  name: string,
+  phone: string,
+  message: string,
+  category: string,
+): string {
   const now = new Date().toLocaleString("ru-RU", {
     timeZone: "Europe/Minsk",
     day: "2-digit",
@@ -130,6 +135,18 @@ function emailHtml(name: string, phone: string, message: string): string {
                     : ""
                 }
 
+                ${
+                  category
+                    ? `
+                <tr>
+                  <td style="padding-bottom:20px;">
+                    <p style="margin:0 0 4px;font-size:10px;font-weight:700;color:#999999;letter-spacing:0.12em;text-transform:uppercase;">Категория</p>
+                    <p style="margin:0;font-size:14px;color:#333333;line-height:1.6;white-space:pre-wrap;">${category}</p>
+                  </td>
+                </tr>`
+                    : ""
+                }
+
               </table>
             </td>
           </tr>
@@ -168,7 +185,9 @@ function emailHtml(name: string, phone: string, message: string): string {
 
 export async function POST(req: Request) {
   try {
-    const { name, phone, message } = await req.json();
+    const { name, phone, message, category } = await req.json();
+
+    console.log(name, phone, message, category);
 
     if (!name || !phone) {
       return Response.json(
@@ -182,7 +201,7 @@ export async function POST(req: Request) {
       to: process.env.MAIL_TO ?? fromEmail,
       subject: `Заявка с сайта: ${name}`,
       text: `Имя: ${name}\nТелефон: ${phone}\nСообщение: ${message || "—"}`,
-      html: emailHtml(name, phone, message),
+      html: emailHtml(name, phone, message, category),
     });
 
     return Response.json({ ok: true });
