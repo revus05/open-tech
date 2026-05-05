@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { createContext, type ReactNode, useContext, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 /* ─── Validation schema ───────────────────────────────────────── */
 
+const CATEGORY_OPTIONS = [
+  "Создание, внедрение, интеграция",
+  "Сервис и аутсорсинг",
+] as const;
+
 const contactSchema = z.object({
-  name: z.string()
+  name: z
+    .string()
     .min(2, "Введите ваше имя (минимум 2 символа)")
     .refine((val) => !/\d/.test(val), {
       message: "Имя не должно содержать цифры",
@@ -29,6 +42,7 @@ const contactSchema = z.object({
     const cleaned = val.replace(/[\s\-()]/g, "");
     return /^(\+375|80)(17|25|29|33|44)\d{7}$/.test(cleaned);
   }, "Введите корректный номер (+375 XX XXX-XX-XX)"),
+  category: z.string().min(1, "Выберите категорию услуг"),
   message: z.string().optional(),
 });
 
@@ -53,9 +67,11 @@ export function ContactModalProvider({ children }: { children: ReactNode }) {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ContactFields>({
     resolver: zodResolver(contactSchema),
+    defaultValues: { category: "" },
   });
 
   const onSubmit = async (data: ContactFields) => {
@@ -163,6 +179,53 @@ export function ContactModalProvider({ children }: { children: ReactNode }) {
                   {errors.phone && (
                     <p className="text-xs text-red-500">
                       {errors.phone.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700">
+                    Категория услуг <span className="text-brand">*</span>
+                  </label>
+                  <Controller
+                    control={control}
+                    name="category"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={isSubmitting}
+                      >
+                        <SelectTrigger
+                          className={`w-full bg-white text-gray-900 border-gray-400 rounded-none ${
+                            errors.category
+                              ? "border-red-400 focus-visible:ring-red-300"
+                              : ""
+                          }`}
+                          aria-invalid={!!errors.category}
+                        >
+                          <SelectValue placeholder="Выберите категорию" />
+                        </SelectTrigger>
+                        <SelectContent
+                          position="popper"
+                          className="bg-white text-gray-900 border-gray-200"
+                        >
+                          {CATEGORY_OPTIONS.map((opt) => (
+                            <SelectItem
+                              key={opt}
+                              value={opt}
+                              className="focus:bg-gray-100 focus:text-gray-900"
+                            >
+                              {opt}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.category && (
+                    <p className="text-xs text-red-500">
+                      {errors.category.message}
                     </p>
                   )}
                 </div>
